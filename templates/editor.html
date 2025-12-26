@@ -1,0 +1,195 @@
+<div style="background: #f0f8ff; padding: 10px; margin-bottom: 20px; border-left: 4px solid #007bff; display: none;" id="data-debug">
+    <h4>Data debugging information</h4>
+    <pre id="data-output"></pre>
+</div>
+
+<div class="controls">
+    <button onclick="saveChanges()">💾 Save</button>
+    <button onclick="saveAndReturnToHome()">💾 Save & Return</button>
+    <button onclick="returnToHome()">🏠 Return to Homepage</button>
+    <button onclick="exportToZip()">📦 Export ZIP</button>
+    <button onclick="exportToPptx()">📥 Export PPTX</button>
+    <button onclick="exportToPDF()">📖 Export PDF</button>
+</div>
+
+<div class="zoom-controls" style="display: flex; align-items: center; gap: 5px;">
+    <button onclick="zoomOut()" title="zoom out">🔍−</button>
+    <input type="number" id="zoom-input" value="100" min="10" max="500" step="5" 
+            style="width: 60px; text-align: center; padding: 5px;">
+    <span>%</span>
+    <button onclick="zoomIn()" title="enlarge">🔍+</button>
+    <button onclick="resetZoom()" title="Reset zoom">🔍↺</button>
+</div>
+
+<div class="slide-container">
+    <div class="slide-content" id="slide-content">
+        <!-- Slide content will passJavaScriptdynamic loading -->
+    </div>
+</div>
+
+<div class="slide-navigation" id="slide-navigation">
+    <!-- The slide navigation buttons will passJavaScriptgenerate -->
+</div>
+
+<div class="controls">
+    <button onclick="showPreviousSlide()" id="prev-btn">⬅️ Previous Slide</button>
+    <span class="slide-counter" id="slide-counter">Page 1/{{total_slides}}</span>
+    <button onclick="showNextSlide()" id="next-btn">➡️ Next Slide</button>
+</div>
+
+
+<!-- existslide-containerafter, slide-navigationadded before -->
+
+<!-- Gitversion control module -->
+<div id="git-snapshots-section" style="margin: 40px auto; max-width: 1200px; padding: 0 20px;">
+    <!-- GitThe toolbar will be dynamically generated here -->
+</div>
+
+<!-- Add quick recovery button（Optional） -->
+<div id="snapshot-recover-floating-btn" style="display: none;">
+    <button onclick="window.recoverFromSnapshotView()" 
+            style="position: fixed; bottom: 20px; right: 20px; z-index: 9999;
+                   background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+                   color: white; border: none; padding: 12px 24px; border-radius: 30px;
+                   cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                   display: flex; align-items: center; gap: 8px; font-weight: 500;">
+        ↩️ Recover Editor
+    </button>
+</div>
+
+<script src="/static/js/git_manager.js" type="module"></script>
+
+<script type="module">
+import { logger } from "/static/js/logger.js";
+function initGitManager() {
+    if (!window.editorData || !window.editorData.sessionId) {
+        logger.warn('⚠️ Unable to initializeGitManager: LacksessionId');
+        return;
+    }
+    
+    try {
+        // Check if you are in snapshot viewing mode
+        const isSnapshotView = window.editorData?.projectInfo?.is_snapshot_view;
+        
+        if (window.gitManagerInitialized) {
+            logger.debug('ℹ️ GitManager has been initialized, jumping over');
+            return;
+        }
+        
+        // createGitManager
+        const gitManager = new window.GitManagerUI(
+            window.editorData.sessionId,
+            window.editorData.projectInfo
+        );
+        
+        const container = document.getElementById('git-snapshots-section');
+        if (container) {
+            // Empty container, avoid duplication
+            container.innerHTML = '';
+            
+            const toolbar = gitManager.createToolbar();
+            container.appendChild(toolbar);
+            
+            // Initial loading snapshot
+            gitManager.refreshSnapshots();
+            
+            logger.debug('✅ GitManager initialization completed');
+            logger.debug('📸 Snapshot viewing mode:', isSnapshotView);
+            
+            // If it is snapshot viewing mode, Set specialUI
+            if (isSnapshotView) {
+                setTimeout(() => {
+                    gitManager.setupSnapshotViewMode();
+                }, 500);
+            }
+            
+            window.gitManagerInitialized = true;
+        }
+        
+    } catch (error) {
+        logger.error('❌ initializationGitManager failed:', error);
+    }
+}
+/*
+document.addEventListener('DOMContentLoaded', function() {
+    // Delayed execution, ensure otherJSLoaded
+    setTimeout(() => {
+        // if there isGitManager instance, Set snapshot viewing mode
+        if (window.gitManager && typeof gitManager.setupSnapshotViewMode === 'function') {
+            gitManager.setupSnapshotViewMode();
+        }
+    }, 1000);
+});
+*/
+// Initialized after the page is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    logger.debug("📄 editor.html DOMLoading completed");
+    logger.debug("🔍 Editor data:", window.editorData);
+    
+    // Check if it is snapshot viewing mode
+    const isSnapshotView = window.editorData?.projectInfo?.is_snapshot_view;
+    
+    if (isSnapshotView) {
+        logger.debug('🎯 Snapshot viewing mode, initializationGitManager（read-only mode）');
+        // Snapshot viewing mode also requiresGitManager to display history and recovery functions
+        if (window.editorData) {
+            initGitManager();
+        }
+        setTimeout(() => {
+            const floatingBtn = document.getElementById('snapshot-recover-floating-btn');
+            if (floatingBtn) {
+                floatingBtn.style.display = 'block';
+            }
+        }, 1500);
+    } else {
+        logger.debug('🛠️ Normal editing mode, initializationGitManager');
+        // Normal editing mode：initializationGitManager
+        if (window.editorData) {
+            initGitManager();
+        } else {
+            // If the data has not been loaded yet, wait a moment
+            setTimeout(() => {
+                if (window.editorData) {
+                    initGitManager();
+                } else {
+                    logger.warn('⚠️ waiteditorDatatime out');
+                }
+            }, 1000);
+        }
+    }
+});
+
+// Modify existinginitEditorfunction（if exists）
+if (typeof initEditor === 'function') {
+    const originalInitEditor = initEditor;
+    initEditor = function(...args) {
+        const result = originalInitEditor.apply(this, args);
+        
+        // Check if it is snapshot viewing mode
+        const isSnapshotView = window.editorData?.projectInfo?.is_snapshot_view;
+        
+        if (!isSnapshotView) {
+            // Only initialize in normal modeGitManager
+            setTimeout(initGitManager, 500);
+        } else {
+            // Snapshot viewing mode also requiresGitManager, but delay
+            setTimeout(initGitManager, 1000);
+        }
+        
+        return result;
+    };
+}
+
+// Add a global function to handle snapshot recovery
+window.recoverFromSnapshotView = async function() {
+    if (!gitManager) {
+        alert('GitManager not initialized');
+        return;
+    }
+    
+    const confirmed = confirm('Are you sure you want to restore editing mode?？\n\nWill exit snapshot viewing mode, Return to the latest status of the current project.');
+    if (confirmed) {
+        await gitManager.exitSnapshotView();
+    }
+};
+</script>

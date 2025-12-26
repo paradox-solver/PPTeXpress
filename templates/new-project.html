@@ -1,0 +1,184 @@
+<div class="new-project-section">
+    <h2>📤 New project</h2>
+    
+    <div class="project-form" style="background: white; padding: 30px; 
+            border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+        <form id="new-project-form" enctype="multipart/form-data">
+            <div style="margin: 20px 0;">
+                <label style="display: block; margin-bottom: 10px; font-weight: bold;">
+                    Project name：
+                </label>
+                <input type="text" name="project_name" required
+                        placeholder="For example：my presentation"
+                        style="width: 100%; padding: 10px; border: 1px solid #ddd; 
+                                border-radius: 5px; box-sizing: border-box;">
+            </div>
+            
+            <div style="margin: 20px 0;">
+                <label style="display: block; margin-bottom: 10px; font-weight: bold;">
+                    PPTXtemplate file：
+                </label>
+                <input type="file" name="pptx_file" accept=".pptx" required
+                        style="padding: 10px; border: 2px dashed #ddd; 
+                                border-radius: 5px; width: 100%; box-sizing: border-box;">
+                <p style="font-size: 12px; color: #666; margin-top: 5px;">
+                    Only supports .pptx format file，maximum50MB
+                </p>
+            </div>
+            
+            <div style="margin-top: 30px; text-align: center;">
+                <button type="submit" 
+                        style="background: #007bff; color: white; padding: 12px 30px; 
+                                border: none; border-radius: 6px; cursor: pointer; 
+                                font-size: 16px; font-weight: bold;">
+                    🚀 Create project
+                </button>
+                
+                <button type="button" onclick="window.location.href='/'" 
+                        style="background: #6c757d; color: white; padding: 12px 30px; 
+                                border: none; border-radius: 6px; cursor: pointer; 
+                                font-size: 16px; margin-left: 10px;">
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    <div id="create-status" style="margin-top: 20px;"></div>
+</div>
+
+<script src="/static/js/editor.js" type="module"></script>
+<script type="module">
+import { logger } from "/static/js/logger.js";
+// Form submission processing
+document.getElementById('new-project-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const statusDiv = document.getElementById('create-status');
+    
+    showStatus('🔄 Creating project...', 'info');
+    
+    try {
+        const response = await fetch('/api/create-project', {
+            method: 'POST',
+            body: formData
+        });
+        
+        // 🔧 repair：Check the response status code insteadJSONinstatusField
+        if (!response.ok) {
+            throw new Error(`Server response error: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        logger.debug('✅ Project creationAPIreturn:', result);
+        
+        // 🔧 repair：Check instead session_id exists
+        if (!result.session_id) {
+            throw new Error('There is no data returned by the serversession_id');
+        }
+        
+        // First show that the creation is successful
+        showStatus(`✅ Project created successfully！Verifying session...`, 'success');
+        
+        // Verify session
+        logger.debug('🔄 Verify session...');
+        try {
+            const verifyResponse = await fetch(`/api/verify-session/${result.session_id}`);
+            
+            if (!verifyResponse.ok) {
+                throw new Error(`Authentication failed: ${verifyResponse.status}`);
+            }
+            
+            const verifyResult = await verifyResponse.json();
+            logger.debug('Session verification results:', verifyResult);
+            
+            if (verifyResult.valid) {
+                // Session verification successful
+                showStatus(`✅ Session verification successful！Jumping to editor...`, 'success');
+                logger.debug('✅ Session verification successful，Jump to editor');
+                
+                // Save project information locally（Prepare for the editor）
+                const projectInfo = {
+                    name: result.project_data?.project?.name || project_name,
+                    id: result.project_id,
+                    created_at: new Date().toISOString(),
+                    session_id: result.session_id
+                };
+                localStorage.setItem('current_project', JSON.stringify(projectInfo));
+                
+                // Jump after a short delay
+                setTimeout(() => {
+                    window.location.href = `/editor/${result.session_id}`;
+                }, 1000);
+                
+            } else {
+                // Session verification failed
+                console.error('❌ Session verification failed:', verifyResult.error);
+                showStatus(`❌ Session verification failed: ${verifyResult.error}`, 'error');
+                
+                // Show debugging options（Keep it as it is）
+                showStatus(`
+                    <div style="padding: 15px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 5px;">
+                        <h4>Project created successfully，But session verification failed</h4>
+                        <p><strong>Project created:</strong> ${result.project_data?.project?.name || 'Unnamed project'}</p>
+                        <p><strong>sessionID:</strong> ${result.session_id}</p>
+                        <p><strong>error message:</strong> ${verifyResult.error || 'unknown error'}</p>
+                        <div style="margin-top: 15px;">
+                            <p>Recommended Action：</p>
+                            <div style="margin-top: 10px;">
+                                <button onclick="window.open('/debug-sessions', '_blank')" 
+                                        style="margin-right: 10px; padding: 8px 16px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer;">
+                                    View all conversations
+                                </button>
+                                <button onclick="tryOpenProject('${result.session_id}')" 
+                                        style="margin-right: 10px; padding: 8px 16px; background: #28a745; color: white; border: none; border-radius: 3px; cursor: pointer;">
+                                    Try to open the project
+                                </button>
+                                <button onclick="location.href='/'" 
+                                        style="padding: 8px 16px; background: #6c757d; color: white; border: none; border-radius: 3px; cursor: pointer;">
+                                    Return to home page
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `, 'warning');
+            }
+            
+        } catch (verifyError) {
+            console.error('Verification request failed:', verifyError);
+            // Verification request failed，But the project may have been created successfully
+            showStatus(`
+                <div style="padding: 15px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 5px;">
+                    <h4>Project created，But the session verification request failed</h4>
+                    <p>The project may have been created successfully，But the session cannot be verified.</p>
+                    <p>mistake: ${verifyError.message}</p>
+                    <div style="margin-top: 10px;">
+                        <button onclick="tryOpenProject('${result.session_id}')" 
+                                style="margin-right: 10px; padding: 8px 16px; background: #28a745; color: white; border: none; border-radius: 3px; cursor: pointer;">
+                            Try to open the project
+                        </button>
+                        <button onclick="location.reload()" 
+                                style="margin-right: 10px; padding: 8px 16px; background: #17a2b8; color: white; border: none; border-radius: 3px; cursor: pointer;">
+                            Refresh the page and try again
+                        </button>
+                    </div>
+                </div>
+            `, 'warning');
+        }
+        
+    } catch (error) {
+        showStatus(`❌ Request failed: ${error.message}`, 'error');
+        console.error('Failed to create project:', error);
+    }
+});
+
+async function tryOpenProject(session_id) {
+    showStatus('🔄 Trying to open project...', 'info');
+    try {
+        window.location.href = `/editor/${session_id}`;
+    } catch (error) {
+        showStatus(`❌ Failed to open project: ${error.message}`, 'error');
+    }
+}
+</script>

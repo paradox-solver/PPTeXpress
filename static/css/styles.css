@@ -1,0 +1,986 @@
+/* static/css/styles.css - Completely restored version */
+body { 
+    font-family: Arial, sans-serif; 
+    margin: 0; 
+    padding: 20px;
+    background-color: #f5f5f5;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.slide-navigation {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+    padding: 10px;
+    background: #e9ecef;
+    border-radius: 5px;
+    flex-wrap: wrap;
+}
+
+.slide-nav-btn {
+    margin: 5px;
+    padding: 8px 15px;
+    border: 1px solid #007bff;
+    background: white;
+    color: #007bff;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.slide-nav-btn.active {
+    background: #007bff;
+    color: white;
+}
+
+/* slide container */
+.slide-container {
+    position: relative;
+    width: 100%;
+    height: 600px;
+    margin: 0 auto;
+    border: 3px solid #007bff;
+    background: white;
+    overflow: auto;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.slide-content {
+    position: relative;
+    width: 100%;
+    min-height: 2000px;
+    background: 
+        linear-gradient(45deg, #f8f9fa 25%, transparent 25%), 
+        linear-gradient(-45deg, #f8f9fa 25%, transparent 25%), 
+        linear-gradient(45deg, transparent 75%, #f8f9fa 75%), 
+        linear-gradient(-45deg, transparent 75%, #f8f9fa 75%);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+}
+
+/* ==================== Global editable styles ==================== */
+
+/* All shape base styles */
+.editable-shape,
+.readonly-shape,
+.editable-table {
+    position: absolute;
+    box-sizing: border-box;
+    overflow: hidden;
+    padding: 8px;
+    min-width: 20px;
+    min-height: 20px;
+    font-size: 14px;
+    z-index: 10;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    
+    /* 🔧 Force editable key attributes */
+    contenteditable: true !important;
+    cursor: text !important;
+    
+    /* Make sure text is selectable and editable */
+    user-select: text !important;
+    -webkit-user-select: text !important;
+    -moz-user-select: text !important;
+    -ms-user-select: text !important;
+    
+    /* Remove styles that may prevent editing */
+    pointer-events: auto !important;
+}
+
+/* ==================== greenplaceholder (Editable shapes) ==================== */
+.editable-shape {
+    border: 2px solid #28a745 !important;
+    background-color: rgba(40, 167, 69, 0.15) !important;
+}
+
+.editable-shape:focus {
+    outline: 2px solid #007bff !important;
+    outline-offset: 2px !important;
+    background-color: rgba(40, 167, 69, 0.25) !important;
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.5) !important;
+}
+
+/* ==================== redplaceholder (read-only shape → Make editable) ==================== */
+.readonly-shape {
+    border: 2px solid #dc3545 !important;
+    background-color: rgba(220, 53, 69, 0.15) !important;
+    cursor: text !important; /* Change to text cursor */
+    
+    /* Remove styles that block selection */
+    user-select: text !important;
+    -webkit-user-select: text !important;
+}
+
+.readonly-shape:focus {
+    outline: 2px solid #dc3545 !important;
+    outline-offset: 2px !important;
+    background-color: rgba(220, 53, 69, 0.25) !important;
+    box-shadow: 0 0 8px rgba(220, 53, 69, 0.5) !important;
+}
+
+/* ==================== blue table ==================== */
+.editable-table {
+    background-color: rgba(0, 123, 255, 0.15) !important;
+    border: 2px solid #007bff !important;
+    padding: 4px !important;
+}
+
+.editable-table:focus {
+    outline: 2px solid #007bff !important;
+    outline-offset: 2px !important;
+    background-color: rgba(0, 123, 255, 0.25) !important;
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.5) !important;
+}
+
+/* Table internal style */
+table {
+    border-collapse: collapse;
+    width: 100%;
+    height: 100%;
+    font-size: 12px;
+}
+
+td, th {
+    border: 1px solid #999;
+    padding: 4px;
+    vertical-align: top;
+    
+    /* 🔧 Table cells are also editable */
+    contenteditable: true !important;
+    cursor: text !important;
+    user-select: text !important;
+    -webkit-user-select: text !important;
+}
+
+/* Editable cell styles */
+.editable-cell,
+td[contenteditable="true"],
+th[contenteditable="true"] {
+    background-color: rgba(255, 255, 224, 0.7) !important;
+    border: 1px solid #ffc107 !important;
+    min-height: 20px;
+}
+
+.editable-cell:focus,
+td[contenteditable="true"]:focus,
+th[contenteditable="true"]:focus {
+    outline: 1px solid #ffc107 !important;
+    background-color: rgba(255, 255, 224, 0.9) !important;
+    box-shadow: 0 0 4px rgba(255, 193, 7, 0.5) !important;
+}
+
+/* ==================== Other shape types ==================== */
+
+/* Picture style */
+.editable-shape[class*="picture"] {
+    background-color: rgba(23, 162, 184, 0.15) !important;
+    border: 2px dashed #17a2b8 !important;
+}
+
+.editable-shape[class*="picture"]:focus {
+    outline: 2px solid #17a2b8 !important;
+    background-color: rgba(23, 162, 184, 0.25) !important;
+}
+
+/* automatic shape styling */
+.editable-shape[class*="shape"]:not([class*="text"]):not([class*="table"]):not([class*="picture"]) {
+    background-color: rgba(253, 126, 20, 0.15) !important;
+    border: 2px solid #fd7e14 !important;
+}
+
+.editable-shape[class*="shape"]:not([class*="text"]):not([class*="table"]):not([class*="picture"]):focus {
+    outline: 2px solid #fd7e14 !important;
+    background-color: rgba(253, 126, 20, 0.25) !important;
+}
+
+/* ==================== Common editing status styles ==================== */
+
+/* Hover effects for all editable elements */
+.editable-shape:hover,
+.readonly-shape:hover,
+.editable-table:hover,
+.editable-cell:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2) !important;
+    transform: translateY(-1px);
+    transition: all 0.2s ease;
+}
+
+/* Visual feedback in editing */
+[contenteditable="true"]:focus {
+    z-index: 1000 !important; /* Make sure the element being edited is on top */
+}
+
+/* ==================== control area ==================== */
+
+.controls {
+    text-align: center;
+    margin: 20px 0;
+}
+
+button {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    margin: 0 5px;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+button:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+}
+
+#status {
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 4px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.success { 
+    background-color: #d4edda; 
+    color: #155724; 
+    border: 1px solid #c3e6cb;
+}
+
+.error { 
+    background-color: #f8d7da; 
+    color: #721c24; 
+    border: 1px solid #f5c6cb;
+}
+
+.slide-counter {
+    text-align: center;
+    margin: 10px 0;
+    font-weight: bold;
+    font-size: 18px;
+    color: #333;
+}
+
+.upload-section {
+    text-align: center;
+    margin: 50px 0;
+}
+
+.upload-form {
+    display: inline-block;
+    padding: 30px;
+    border: 3px dashed #007bff;
+    border-radius: 10px;
+    background: #f8f9fa;
+}
+
+/* ==================== Responsive design ==================== */
+
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+    
+    .slide-container {
+        height: 400px;
+    }
+    
+    .editable-shape,
+    .readonly-shape,
+    .editable-table {
+        font-size: 12px;
+        padding: 6px;
+    }
+}
+
+/* ==================== debug style ==================== */
+
+.debug-outline {
+    outline: 1px solid red !important;
+}
+
+.debug-outline-green {
+    outline: 1px solid green !important;
+}
+
+.debug-outline-blue {
+    outline: 1px solid blue !important;
+}
+
+/* Basic styles for various shapes */
+.shape-container {
+    box-sizing: border-box;
+    position: absolute;
+    overflow: hidden;
+}
+
+/* Picture shape */
+.picture-shape {
+    border: 1px solid #ddd;
+    background-color: #f5f5f5;
+}
+
+.picture-shape img {
+    max-width: 100%;
+    max-height: 100%;
+    display: block;
+}
+
+/* Combined shapes */
+.group-container {
+    border: 2px dashed #6a11cb;
+    background: linear-gradient(135deg, rgba(106, 17, 203, 0.05) 0%, rgba(37, 117, 252, 0.05) 100%);
+    pointer-events: none; /* The composition itself does not receive events */
+}
+
+.group-container > * {
+    pointer-events: auto; /* But child elements receive events */
+}
+
+/* table shape */
+.table-shape {
+    border: 1px solid #4a5568;
+    background: white;
+}
+
+.table-shape table {
+    width: 100%;
+    height: 100%;
+    border-collapse: collapse;
+}
+
+.table-shape td, .table-shape th {
+    border: 1px solid #cbd5e0;
+    padding: 4px;
+    vertical-align: top;
+}
+
+/* Editable styles */
+.editable-shape {
+    cursor: text;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.editable-shape:hover {
+    background-color: rgba(144, 238, 144, 0.8) !important;
+    border-color: #198754 !important;
+}
+
+.editable-shape:focus {
+    outline: 2px solid #0d6efd;
+    outline-offset: 2px;
+    background-color: rgba(144, 238, 144, 0.9) !important;
+}
+
+/* Shape rotation support */
+.rotated-shape {
+    transform-origin: center center;
+}
+
+/* Navigation button style */
+.controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin: 20px 0;
+    flex-wrap: wrap;
+}
+
+.controls button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.controls button:hover {
+    opacity: 0.9;
+}
+
+/* specific button color */
+.controls button:nth-child(1) { /* Previous picture */ 
+    background: #6c757d; color: white;
+}
+.controls button:nth-child(2) { /* Save changes */
+    background: #28a745; color: white;
+}
+.controls button:nth-child(3) { /* Save and return */
+    background: #20c997; color: white;
+}
+.controls button:nth-child(4) { /* Return to home page */
+    background: #ffc107; color: #212529;
+}
+.controls button:nth-child(5) { /* ExportPPTX */
+    background: #007bff; color: white;
+}
+.controls button:nth-child(6) { /* ExportPDF */
+    background: #6610f2; color: white;
+}
+.controls button:nth-child(7) { /* Next */
+    background: #6c757d; color: white;
+}
+
+/* Upload area style */
+.upload-section {
+    text-align: center;
+    padding: 40px 20px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.upload-form {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+}
+
+/* Zoom control style */
+.zoom-controls {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-left: 20px;
+}
+
+.zoom-controls button {
+    background: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+
+.zoom-controls button:hover {
+    background: #5a6268;
+}
+
+.zoom-controls button:active {
+    transform: scale(0.95);
+}
+
+#zoom-input {
+    width: 60px;
+    text-align: center;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: 14px;
+}
+
+#zoom-input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+}
+
+/* Basic styles for various shapes */
+.picture-shape { background: rgba(135, 206, 250, 0.6); border: 2px dashed #17a2b8; }
+.group-shape { background: rgba(111, 66, 193, 0.1); border: 2px dashed #6f42c1; }
+.table-shape { background: rgba(173, 216, 230, 0.6); border: 2px solid #007bff; }
+.chart-shape { background: rgba(255, 209, 220, 0.6); border: 2px solid #e91e63; }
+.smartart-shape { background: rgba(102, 187, 106, 0.6); border: 2px solid #388e3c; }
+.placeholder-shape { background: rgba(144, 238, 144, 0.6); border: 2px solid #28a745; }
+.textbox-shape { background: rgba(224, 242, 241, 0.8); border: 2px solid #00897b; }
+.autoshape-shape { background: rgba(255, 165, 0, 0.6); border: 2px solid #fd7e14; }
+.line-shape { background: rgba(108, 117, 125, 0.6); border: none; }
+.unknown-shape { background: rgba(220, 53, 69, 0.6); border: 2px dashed #dc3545; }
+
+/* editable state */
+[contenteditable="true"] {
+    cursor: text;
+    transition: background-color 0.3s;
+}
+
+[contenteditable="true"]:hover {
+    opacity: 0.9;
+}
+
+[contenteditable="true"]:focus {
+    outline: 2px solid #0d6efd;
+    outline-offset: 2px;
+}
+
+/* ============================================
+   Double click to edit style
+   ============================================ */
+
+/* Double click prompt */
+[data-manually-enabled="true"],
+.element-manually-edited {
+    background-color: rgba(255, 235, 59, 0.7) !important;
+    border: 3px solid #ff9800 !important;
+    transition: all 0.2s ease;
+}
+
+.element-manually-edited:focus {
+    box-shadow: 0 0 20px rgba(255, 152, 0, 0.6) !important;
+    outline: 2px solid #ff9800 !important;
+    outline-offset: 2px;
+}
+
+/* Double click hover prompt */
+.slide-content > div:not([contenteditable="true"]):hover {
+    cursor: pointer;
+    opacity: 0.95;
+}
+
+.slide-content > div:not([contenteditable="true"])::after {
+    content: "Double click to edit";
+    position: absolute;
+    top: -24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: bold;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.3s, top 0.3s;
+    pointer-events: none;
+    z-index: 100;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.slide-content > div:not([contenteditable="true"]):hover::after {
+    opacity: 1;
+    top: -28px;
+}
+
+/* Double click animation effect */
+@keyframes doubleClickPulse {
+    0% { box-shadow: 0 0 0 0 rgba(255, 152, 0, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(255, 152, 0, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 152, 0, 0); }
+}
+
+.double-click-pulse {
+    animation: doubleClickPulse 0.6s;
+}
+
+/* Manually enable edited tags */
+.element-manually-edited::before {
+    content: "✏️";
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #ff9800;
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    z-index: 10;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* ============================================
+   Text tree handler style
+   ============================================ */
+
+/* text paragraph */
+.text-paragraph {
+    margin: 2px 0;
+    line-height: 1.4;
+}
+
+/* text run block（leaf node） */
+.text-run {
+    display: inline-block;
+    position: relative;
+    padding: 1px 2px;
+    border-radius: 2px;
+    transition: background-color 0.2s;
+}
+
+/* ghost separator style */
+.text-run::after {
+    content: " │ ";
+    color: rgba(0, 0, 0, 0.2);
+    font-weight: normal;
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* The last leaf node does not require a separator */
+.text-run:last-child::after {
+    content: none;
+}
+
+/* Leaf node hover effect */
+.text-run:hover {
+    background-color: rgba(255, 235, 59, 0.3);
+}
+
+/* The currently edited leaf node */
+.text-run:focus {
+    background-color: rgba(144, 238, 144, 0.5) !important;
+    outline: 2px solid #28a745;
+    outline-offset: 1px;
+}
+
+/* Development debugging flags */
+[data-tree-path] {
+    border: 1px dotted rgba(0, 0, 0, 0.1);
+}
+
+/* Project card style */
+.project-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 10px 0;
+    background: white;
+    transition: box-shadow 0.3s;
+}
+
+.project-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.project-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.project-status {
+    font-size: 12px;
+    padding: 3px 8px;
+    border-radius: 12px;
+    background: #e9ecef;
+}
+
+.project-status.modified {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.project-path {
+    font-size: 12px;
+    color: #6c757d;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 🔧 New：Image related styles */
+
+/* Picture operation menu */
+.image-actions-menu {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    min-width: 200px;
+    z-index: 10000;
+}
+
+.image-actions-header {
+    padding: 10px 15px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f8f9fa;
+    border-radius: 8px 8px 0 0;
+}
+
+.image-actions-header strong {
+    font-size: 14px;
+    color: #333;
+}
+
+.close-menu-btn {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #999;
+    line-height: 1;
+}
+
+.close-menu-btn:hover {
+    color: #333;
+}
+
+.image-actions-body {
+    padding: 10px 0;
+}
+
+.image-action-btn {
+    display: block;
+    width: 100%;
+    padding: 10px 15px;
+    background: none;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    transition: background-color 0.2s;
+}
+
+.image-action-btn:hover {
+    background-color: #f5f5f5;
+}
+
+.image-action-btn:active {
+    background-color: #e9e9e9;
+}
+
+/* Image upload dialog */
+#image-upload-dialog {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10001;
+}
+
+.image-upload-modal {
+    background: white;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow: hidden;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+}
+
+.modal-header {
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+    color: white;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.close-btn {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: white;
+    font-size: 24px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+}
+
+.close-btn:hover {
+    background: rgba(255,255,255,0.3);
+}
+
+.modal-body {
+    padding: 20px;
+    overflow-y: auto;
+    max-height: calc(90vh - 130px);
+}
+
+.upload-zone {
+    border: 2px dashed #007bff;
+    border-radius: 10px;
+    padding: 40px 20px;
+    text-align: center;
+    background: #f8faff;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.upload-zone:hover {
+    background: #eef5ff;
+    border-color: #0056b3;
+}
+
+.upload-icon {
+    font-size: 48px;
+    margin-bottom: 15px;
+    color: #007bff;
+}
+
+.upload-zone p {
+    margin: 10px 0 20px;
+    color: #666;
+}
+
+.preview-area {
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #f9f9f9;
+}
+
+.preview-info {
+    margin-top: 15px;
+    font-size: 14px;
+    color: #555;
+}
+
+.preview-info p {
+    margin: 5px 0;
+}
+
+.progress-area {
+    margin-top: 20px;
+}
+
+.progress-bar {
+    height: 10px;
+    background: #e9ecef;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4cd964, #5ac8fa);
+    border-radius: 5px;
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+.modal-footer {
+    padding: 15px 20px;
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    background: #f8f9fa;
+}
+
+/* Picture viewer */
+.image-viewer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10002;
+}
+
+.viewer-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(4px);
+}
+
+.viewer-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    min-width: 300px;
+    max-width: 90vw;
+    max-height: 90vh;
+}
+
+.viewer-header {
+    padding: 15px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    text-align: right;
+}
+
+.close-viewer {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: white;
+    font-size: 24px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.viewer-body {
+    padding: 30px;
+    text-align: center;
+    max-height: 70vh;
+    overflow: auto;
+}
+
+.viewer-footer {
+    padding: 15px;
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f8f9fa;
+}
+
+.viewer-footer p {
+    margin: 0;
+    color: #666;
+    font-size: 14px;
+}
+
+.text-frame, .text-paragraph, .text-run {
+    position: relative;
+    z-index: 1001;
+}
+
+.placeholder-shape, .textbox-shape {
+    height: auto !important;
+    
+    padding: 8px !important;
+    
+    display: inline-block;
+    white-space: normal;
+    background-color: rgba(224, 242, 241, 0.5) !important;
+    z-index: 1000;
+}

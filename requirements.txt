@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+python-pptx
+python-multipart
+aspose-slides
+pyyaml
+platformdirs
